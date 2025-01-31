@@ -30,8 +30,8 @@ RUN \
     mkdir build && \
     cd build && \
     ../configure && \
-    sudo make && \
-    sudo make install
+    make && \
+    make install
 
 WORKDIR /webkit
 
