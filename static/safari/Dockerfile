@@ -2,6 +2,10 @@ FROM ubuntu:22.04 as build
 
 ARG WEBKIT_TAG="main"
 
+RUN \
+    apt-get update && \
+    apt-get -y install --no-install-recommends ca-certificates git
+
 # clone webkit first so we don't have to keep re-doing it
 RUN \
     git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit
@@ -10,10 +14,6 @@ RUN \
 RUN apt-get update && apt-get -y install libbrotli1
 COPY libjxl /tmp/libjxl
 RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
-
-RUN \
-    apt-get update && \
-    apt-get -y install --no-install-recommends ca-certificates git
 
 # install deps
 RUN \
