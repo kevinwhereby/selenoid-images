@@ -2,9 +2,13 @@ FROM ubuntu:22.04 as build
 
 ARG WEBKIT_TAG="main"
 
+COPY libjxl /tmp/libjxl
+
+RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
+
 RUN \
     apt-get update && \
-    apt-get -y install --no-install-recommends ca-certificates git libjxl && \
+    apt-get -y install --no-install-recommends ca-certificates git && \
     git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit && \
     mkdir -p /opt/webkit && \
     cd webkit && \
