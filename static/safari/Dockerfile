@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as build
+FROM ubuntu:22.04 AS build
 
 ARG WEBKIT_TAG="main"
 
@@ -22,13 +22,24 @@ RUN \
     yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
 
 # # try the build
-# RUN \
-#     cmake -DPORT=GTK -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/webkit -DUSE_WPE_RENDERER=OFF -DENABLE_MINIBROWSER=ON -DENABLE_BUBBLEWRAP_SANDBOX=OFF -DENABLE_GAMEPAD=OFF -DENABLE_SPELLCHECK=OFF -DENABLE_WAYLAND_TARGET=OFF -DUSE_OPENJPEG=OFF -GNinja && \
-#     ninja && \
-#     ninja install && \
-#     rm -Rf /var/lib/apt/lists/*
+RUN \
+    cmake -DPORT=GTK \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/opt/webkit \
+        -DUSE_WPE_RENDERER=OFF -DENABLE_MINIBROWSER=ON \
+        -DENABLE_BUBBLEWRAP_SANDBOX=OFF -DENABLE_GAMEPAD=OFF \
+        -DENABLE_SPELLCHECK=OFF \
+        -DENABLE_WAYLAND_TARGET=OFF \
+        -DUSE_OPENJPEG=OFF -GNinja \
+        -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
+        -DCMAKE_INCLUDE_PATH=/usr/include \
+        -DJPEGXL_LIBRARY=/usr/lib/x86_64-linux-gnu/libjxl.so.0.11.1 \
+        -DJPEGXL_INCLUDE_DIR=/usr/include && \
+    ninja && \
+    ninja install && \
+    rm -Rf /var/lib/apt/lists/*
 
-# FROM golang:1.22-bullseye as go
+# FROM golang:1.22-bullseye AS go
 
 # COPY cmd/prism /prism
 
