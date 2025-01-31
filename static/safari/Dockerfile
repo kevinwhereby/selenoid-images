@@ -3,7 +3,8 @@ FROM ubuntu:22.04 as build
 ARG WEBKIT_TAG="main"
 
 # clone webkit first so we don't have to keep re-doing it
-RUN git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit
+RUN \
+    git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit
 
 # libjxl required for webkit build
 RUN apt-get update && apt-get -y install libbrotli1
