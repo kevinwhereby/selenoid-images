@@ -16,13 +16,13 @@ COPY libjxl /tmp/libjxl
 RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
 
 # install deps
-RUN \
-    mkdir -p /opt/webkit && \
-    cd webkit && \
-    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
+RUN mkdir -p /opt/webkit
+
+WORKDIR /webkit
+
+RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
 
 # # try the build
-
 RUN \
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
@@ -34,6 +34,8 @@ RUN \
         -DENABLE_SPELLCHECK=OFF \
         -DENABLE_WAYLAND_TARGET=OFF \
         -DUSE_OPENJPEG=OFF -GNinja \
+        -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
+        -DCMAKE_INCLUDE_PATH=/usr/include \
         -DJPEGXL_LIBRARY=/usr/lib/x86_64-linux-gnu/libjxl.so.0.11.1 \
         -DJPEGXL_INCLUDE_DIR=/usr/include && \
     ninja && \
