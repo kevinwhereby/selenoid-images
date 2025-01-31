@@ -4,7 +4,7 @@ ARG WEBKIT_TAG="main"
 
 RUN \
     apt-get update && \
-    apt-get -y install --no-install-recommends ca-certificates git && \
+    apt-get -y install --no-install-recommends ca-certificates git libjxl && \
     git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit && \
     mkdir -p /opt/webkit && \
     cd webkit && \
@@ -50,8 +50,7 @@ RUN \
         libxslt1.1 \
         libegl1 \
         libatomic1 \
-        libopengl0 \
-        libjxl && \
+        libopengl0 && \
     ldconfig && \
     apt-get clean && \
     rm -Rf /tmp/* && rm -Rf /var/lib/apt/lists/* && \
