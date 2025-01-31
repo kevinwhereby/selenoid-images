@@ -14,6 +14,7 @@ RUN \
 RUN apt-get update && apt-get -y install libbrotli1
 COPY libjxl /tmp/libjxl
 RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
+RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
 
 # install deps
 RUN mkdir -p /opt/webkit
