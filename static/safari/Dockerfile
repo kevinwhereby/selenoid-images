@@ -2,8 +2,9 @@ FROM ubuntu:22.04 as build
 
 ARG WEBKIT_TAG="main"
 
-COPY libjxl /tmp/libjxl
+RUN apt-get update && apt-get -y install libbrotli1
 
+COPY libjxl /tmp/libjxl
 RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
 
 RUN \
