@@ -2,18 +2,26 @@ FROM ubuntu:22.04 as build
 
 ARG WEBKIT_TAG="main"
 
-RUN apt-get update && apt-get -y install libbrotli1
+# clone webkit first so we don't have to keep re-doing it
+RUN git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit
 
+# libjxl required for webkit build
+RUN apt-get update && apt-get -y install libbrotli1
 COPY libjxl /tmp/libjxl
 RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
 
 RUN \
     apt-get update && \
-    apt-get -y install --no-install-recommends ca-certificates git && \
-    git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit && \
+    apt-get -y install --no-install-recommends ca-certificates git
+
+# install deps
+RUN \
     mkdir -p /opt/webkit && \
     cd webkit && \
-    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
+    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
+
+# try the build
+RUN \
     cmake -DPORT=GTK -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/webkit -DUSE_WPE_RENDERER=OFF -DENABLE_MINIBROWSER=ON -DENABLE_BUBBLEWRAP_SANDBOX=OFF -DENABLE_GAMEPAD=OFF -DENABLE_SPELLCHECK=OFF -DENABLE_WAYLAND_TARGET=OFF -DUSE_OPENJPEG=OFF -GNinja && \
     ninja && \
     ninja install && \
