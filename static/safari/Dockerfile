@@ -80,6 +80,7 @@ RUN \
     apt-get -y install --no-install-recommends \
         libsoup-3.0-0 \
         libgtk-3-0 \
+        libgtk-4-dev \
         libwebp7 \
         libwebpdemux2 \
         libsecret-1-0 \
