@@ -64,9 +64,10 @@ if [ "$ENABLE_VNC" == "true" ]; then
     x11vnc -display "$DISPLAY" -passwd selenoid -shared -forever -loop500 -rfbport 5900 -rfbportv6 5900 -logfile /dev/null &
     X11VNC_PID=$!
 fi
-
+echo "Starting..."
 DISPLAY="$DISPLAY" /opt/webkit/bin/WebKitWebDriver --port=4444 --host=0.0.0.0 ${DRIVER_ARGS} &
 DRIVER_PID=$!
+echo "Sarted"
 
 /usr/bin/prism  &
 PRISM_PID=$!
