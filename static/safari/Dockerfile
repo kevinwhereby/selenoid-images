@@ -81,6 +81,7 @@ RUN \
         libsoup-3.0-0 \
         libgtk-3-0 \
         libgtk-4-dev \
+        libavif-dev \
         libwebp7 \
         libwebpdemux2 \
         libwebpmux3 \
