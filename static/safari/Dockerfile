@@ -83,6 +83,7 @@ RUN \
         libgtk-4-dev \
         libwebp7 \
         libwebpdemux2 \
+        libwebpmux3 \
         libsecret-1-0 \
         libhyphen0 \
         libwoff1 \
