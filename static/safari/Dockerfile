@@ -89,6 +89,7 @@ RUN \
         libwoff1 \
         libharfbuzz-icu0 \
         libgstreamer-gl1.0-0 \
+        libgstreamer-plugins-bad1.0-0 \
         libopenjp2-7 \
         libnotify4 \
         libxslt1.1 \
