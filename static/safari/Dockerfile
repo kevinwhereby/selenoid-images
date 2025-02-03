@@ -104,6 +104,11 @@ RUN \
     mkdir /tmp/ca-certificates && \
     chmod 777 /tmp/ca-certificates
 
+RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev
+COPY libjxl /tmp/libjxl
+RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
+RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
+
 COPY entrypoint.sh /
 
 USER selenium
