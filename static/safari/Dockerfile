@@ -90,6 +90,7 @@ RUN \
         libharfbuzz-icu0 \
         libgstreamer-gl1.0-0 \
         libgstreamer-plugins-bad1.0-0 \
+        flite1-dev \
         libopenjp2-7 \
         libnotify4 \
         libxslt1.1 \
