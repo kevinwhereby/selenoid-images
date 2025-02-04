@@ -36,6 +36,9 @@ RUN \
 
 WORKDIR /webkit
 
+RUN apt-get update && \
+    apt get install -y libsysprof-4-dev
+
 # # try the build
 RUN \
     cmake -DPORT=GTK \
