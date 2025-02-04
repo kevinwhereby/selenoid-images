@@ -6,9 +6,11 @@ RUN \
     apt-get update && \
     apt-get -y install --no-install-recommends ca-certificates git
 
+RUN --mount=type=bind,source=build,target=/opt/build
+
 # clone webkit first so we don't have to keep re-doing it
 RUN \
-    git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git webkit
+    git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git /opt/build/webkit
 
 # libjxl required for webkit build
 RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev
@@ -20,22 +22,22 @@ RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
 # RUN mkdir -p /opt/webkit
 RUN --mount=type=bind,source=webkit,target=/opt/webkit
 
-WORKDIR /webkit
+WORKDIR /opt/build/webkit
 
 RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
 
 WORKDIR /
 
 RUN \
-    git clone https://github.com/ianlancetaylor/libbacktrace.git && \
-    cd libbacktrace && \
+    git clone https://github.com/ianlancetaylor/libbacktrace.git /opt/build/libbacktrace && \
+    cd /opt/build/libbacktrace && \
     mkdir build && \
     cd build && \
     ../configure && \
     make && \
     make install
 
-WORKDIR /webkit
+WORKDIR /opt/build/webkit
 
 # # try the build
 RUN \
