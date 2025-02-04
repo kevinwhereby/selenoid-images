@@ -17,7 +17,8 @@ RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
 RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
 
 # install deps
-RUN mkdir -p /opt/webkit
+# RUN mkdir -p /opt/webkit
+RUN --mount=type=bind,source=webkit,target=/opt/webkit
 
 WORKDIR /webkit
 
