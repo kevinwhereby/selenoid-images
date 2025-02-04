@@ -1,14 +1,10 @@
 FROM ubuntu:22.04 AS build
 
-ARG WEBKIT_TAG="WebKit-7620.2.4.111.7"
+ARG WEBKIT_TAG="WebKit-7619.2.8.11.3"
 
 RUN \
     apt-get update && \
     apt-get -y install --no-install-recommends ca-certificates git
-
-# clone webkit first so we don't have to keep re-doing it
-RUN \
-    git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git /webkit
 
 # libjxl required for webkit build
 RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev
@@ -18,6 +14,9 @@ RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
 
 # install deps
 RUN mkdir -p /opt/webkit
+
+RUN \
+    git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git /webkit
 
 WORKDIR /webkit
 
