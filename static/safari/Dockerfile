@@ -30,6 +30,7 @@ RUN --mount=type=bind,target=/webkit,source=webkit,rw \
     cd /webkit && \
     yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies \
     cmake -DPORT=GTK \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
         -DUSE_WPE_RENDERER=OFF \
