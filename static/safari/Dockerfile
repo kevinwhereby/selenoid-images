@@ -1,25 +1,15 @@
 FROM ubuntu:22.04 AS build
 
-RUN \
-    apt-get update && \
+RUN apt-get update && \
     apt-get -y install --no-install-recommends ca-certificates git
 
 # libjxl required for webkit build
-RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev
-COPY libjxl /tmp/libjxl
-RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
-RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
+RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev \
+    libsysprof-4-dev build-essential ccache ninja-build
 
-# install deps
-RUN mkdir -p /opt/webkit
-
-COPY webkit /webkit
-
-WORKDIR /webkit
-
-RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
-
-WORKDIR /
+RUN --mount=type=bind,target=/tmp/libjxl,source=libjxl \
+    dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb && \
+    dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
 
 RUN \
     git clone https://github.com/ianlancetaylor/libbacktrace.git && \
@@ -30,13 +20,15 @@ RUN \
     make && \
     make install
 
-WORKDIR /webkit
+# install deps
+RUN mkdir -p /opt/webkit
 
-RUN apt-get update && \
-    apt-get install -y libsysprof-4-dev
-
-# # try the build
-RUN \
+RUN --mount=type=bind,target=/webkit,source=webkit,rw \
+    --mount=type=cache,target=/root/.ccache \
+    export CCACHE_DIR=/root/.ccache && \
+    export PATH="/usr/lib/ccache:$PATH" && \
+    cd /webkit &&
+    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies \
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
@@ -46,7 +38,8 @@ RUN \
         -DENABLE_GAMEPAD=OFF \
         -DENABLE_SPELLCHECK=OFF \
         -DENABLE_WAYLAND_TARGET=OFF \
-        -DENABLE_EXPERIMENTAL_FEATURES=ON \
+        -DENABLE_WEB_RTC=ON \
+        # -DENABLE_EXPERIMENTAL_FEATURES=ON \
         -DUSE_OPENJPEG=OFF -GNinja \
         -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
         -DCMAKE_INCLUDE_PATH=/usr/include \
