@@ -5,7 +5,7 @@ RUN apt-get update && \
 
 # libjxl required for webkit build
 RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev \
-    libsysprof-4-dev build-essential ccache
+    libsysprof-4-dev build-essential ccache ninja-build
 
 RUN --mount=type=bind,target=/tmp/libjxl,source=libjxl \
     dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb && \
