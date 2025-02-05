@@ -1,17 +1,17 @@
-var MockOptions = function () { return ({
+const MockOptions = () => ({
     getUserMedia: true,
     mediaDevices: {
         getUserMedia: true,
         getSupportedConstraints: true,
         enumerateDevices: true,
     },
-}); };
+});
 /**
  * Class for creating mock of getUserMedia for navigator.getUserMedia and navigator.mediaDevice.getUserMedia.
  * Usage: const m = new GetUserMediaMock(); m.setup();
  */
-var GetUserMediaMock = /** @class */ (function () {
-    function GetUserMediaMock() {
+class GetUserMediaMock {
+    constructor() {
         this.DEFAULT_MEDIA = {
             VIDEO: "/video.mp4",
             AUDIO: "-.mp3",
@@ -64,14 +64,14 @@ var GetUserMediaMock = /** @class */ (function () {
         };
     }
     // noinspection JSConstantReassignment
-    GetUserMediaMock.prototype._storeOldHandles = function () {
+    _storeOldHandles() {
         // @ts-ignore
         navigator._getUserMedia = navigator.getUserMedia;
         if (!navigator.mediaDevices) {
             // Fallback. May have some issues.
             navigator.mediaDevices = {};
         }
-        var m = navigator.mediaDevices;
+        const m = navigator.mediaDevices;
         // @ts-ignore
         m._enumerateDevices = m.enumerateDevices;
         // @ts-ignore
@@ -79,62 +79,58 @@ var GetUserMediaMock = /** @class */ (function () {
         // @ts-ignore
         m._getUserMedia = m.getUserMedia;
         this.state.prepared = true;
-    };
+    }
     /**
      * Dynamically update constraints. Applied on next call of getUserMedia, etc.
      * @param {string} type any key in this.settings.constraints
      * @param {Partial<MediaStreamConstraints>} updates Data to apply to constraints
      * @param {boolean} overwrite Whether to fully overwrite original.
      */
-    GetUserMediaMock.prototype.updateConstraints = function (type, updates, overwrite) {
-        if (type === void 0) { type = "video"; }
-        if (updates === void 0) { updates = {}; }
-        if (overwrite === void 0) { overwrite = false; }
-        var c = this.settings.constraints;
+    updateConstraints(type = "video", updates = {}, overwrite = false) {
+        const c = this.settings.constraints;
         if (!c[type]) {
             return false;
         }
         if (overwrite) {
             c[type] = {};
         }
-        for (var key in updates) {
+        for (const key in updates) {
             c[type][key] = updates[key];
         }
         return this;
-    };
+    }
     /**
      * Set media URL for mockType "mediaElement"
      * @param {string} url
      */
-    GetUserMediaMock.prototype.setMediaUrl = function (url) {
+    setMediaUrl(url) {
         this.settings.mediaUrl = url;
         return this;
-    };
+    }
     /**
      * Set a predefined mock type via string or a custom function.
      * @param {MockType} mockType
      */
-    GetUserMediaMock.prototype.setMockType = function (mockType) {
+    setMockType(mockType) {
         this.settings.mockType = mockType;
         return this;
-    };
+    }
     /**
      * Applies mock to environment ONLY IF getUserMedia constraints fail.
      */
-    GetUserMediaMock.prototype.fallbackMock = function () {
-        var _this = this;
+    fallbackMock() {
         if (!this.state.prepared) {
             this._storeOldHandles();
         }
         /**
          * @param {(stream: MediaStream) => void} handle
          */
-        var getSuccessHandle = function (handle) {
+        const getSuccessHandle = (handle) => {
             /**
              * @param {MediaStream} stream
              */
-            return function (stream) {
-                _this._log("log", "fallback NOT implemented");
+            return (stream) => {
+                this._log("log", "fallback NOT implemented");
                 handle(stream);
             };
         };
@@ -142,9 +138,9 @@ var GetUserMediaMock = /** @class */ (function () {
          * @param {Error} err
          * @param {MediaStreamConstraints} constraints
          */
-        var handleFallback = function (err, constraints) {
-            return _this.getMockStreamFromConstraints(constraints).then(function (stream) {
-                _this._log("warn", "fallbackMock implemented", err);
+        const handleFallback = (err, constraints) => {
+            return this.getMockStreamFromConstraints(constraints).then((stream) => {
+                this._log("warn", "fallbackMock implemented", err);
                 return stream;
             });
         };
@@ -155,9 +151,9 @@ var GetUserMediaMock = /** @class */ (function () {
          * @param {(err: Error) => void|any} onError
          */
         // @ts-ignore
-        navigator.getUserMedia = function (constraints, onSuccess, onError) {
+        navigator.getUserMedia = (constraints, onSuccess, onError) => {
             // @ts-ignore
-            navigator._getUserMedia(constraints, getSuccessHandle(onSuccess), function (err) {
+            navigator._getUserMedia(constraints, getSuccessHandle(onSuccess), (err) => {
                 return handleFallback(err, constraints).then(onSuccess).catch(onError);
             });
         };
@@ -165,26 +161,25 @@ var GetUserMediaMock = /** @class */ (function () {
          * navigator.mediaDevices.getUserMedia
          * @param {MediaStreamConstraints} constraints
          */
-        navigator.mediaDevices.getUserMedia = function (constraints) {
-            return new Promise(function (resolve, reject) {
+        navigator.mediaDevices.getUserMedia = (constraints) => {
+            return new Promise((resolve, reject) => {
                 navigator.mediaDevices
                     // @ts-ignore
                     ._getUserMedia(constraints)
                     .then(getSuccessHandle(resolve))
-                    .catch(function (err) {
+                    .catch((err) => {
                     return handleFallback(err, constraints).then(resolve).catch(reject);
                 });
             });
         };
         return this;
-    };
+    }
     /**
      * Applies mock to environment.
      * Generally should be applied before other scripts once.
      * @param {MockOptions} options Way to only mock certain features. Mocks all by default.
      */
-    GetUserMediaMock.prototype.mock = function (options) {
-        var _this = this;
+    mock(options) {
         if (typeof options !== "object") {
             options = MockOptions();
         }
@@ -194,38 +189,38 @@ var GetUserMediaMock = /** @class */ (function () {
         // navigator.getUserMedia
         if (options.getUserMedia) {
             // @ts-ignore
-            navigator.getUserMedia = function (constraints, onSuccess, onError) {
-                return _this.getMockStreamFromConstraints(constraints).then(onSuccess).catch(onError);
+            navigator.getUserMedia = (constraints, onSuccess, onError) => {
+                return this.getMockStreamFromConstraints(constraints).then(onSuccess).catch(onError);
             };
         }
         if (options.mediaDevices) {
             // navigator.mediaDevices.getUserMedia
             if (options.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia = function (constraints) {
-                    return _this.getMockStreamFromConstraints(constraints);
+                navigator.mediaDevices.getUserMedia = (constraints) => {
+                    return this.getMockStreamFromConstraints(constraints);
                 };
             }
             // navigator.mediaDevices.getSupportedConstraints
             if (options.mediaDevices.getSupportedConstraints) {
                 // @ts-ignore
-                navigator.mediaDevices.getSupportedConstraints = function () {
-                    return _this.settings.constraints;
+                navigator.mediaDevices.getSupportedConstraints = () => {
+                    return this.settings.constraints;
                 };
             }
             // navigator.mediaDevices.enumerateDevices
             if (options.mediaDevices.enumerateDevices) {
                 // @ts-ignore
-                navigator.mediaDevices.enumerateDevices = function () {
-                    return _this.getMockDevices();
+                navigator.mediaDevices.enumerateDevices = () => {
+                    return this.getMockDevices();
                 };
             }
         }
         return this;
-    };
+    }
     /**
      * Restores actually native handles if mock handles already applied.
      */
-    GetUserMediaMock.prototype.restoreOldHandles = function () {
+    restoreOldHandles() {
         // @ts-ignore
         if (navigator._getUserMedia) {
             // @ts-ignore
@@ -246,7 +241,7 @@ var GetUserMediaMock = /** @class */ (function () {
                 navigator.mediaDevices._getUserMedia;
         }
         this.state.prepared = false;
-    };
+    }
     /**
      * Gets a media stream with motion and color.
      * @see https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints
@@ -255,9 +250,9 @@ var GetUserMediaMock = /** @class */ (function () {
      * @see https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaStreamDestination
      * @param {MediaStreamConstraints} constraints
      */
-    GetUserMediaMock.prototype.getMockStreamFromConstraints = function (constraints) {
-        var stream = null;
-        var mockType = this.settings.mockType;
+    getMockStreamFromConstraints(constraints) {
+        let stream = null;
+        const mockType = this.settings.mockType;
         if (mockType === "canvas") {
             stream = this.getMockCanvasStream(constraints);
         }
@@ -272,31 +267,31 @@ var GetUserMediaMock = /** @class */ (function () {
             throw new Error("invalid mockType: " + String(mockType));
         }
         return Promise.resolve(stream);
-    };
+    }
     /**
      * Returns stream that is internally generated using canvas and random data.
      * ONCE STREAM IS NO LONGER NEEDED, SHOULD CALL .stop FUNCTION TO STOP DRAW INTERVAL.
      * @param {MediaStreamConstraints} constraints
      * @return {MediaStream}
      */
-    GetUserMediaMock.prototype.getMockCanvasStream = function (constraints) {
-        var canvas = document.createElement("canvas");
+    getMockCanvasStream(constraints) {
+        const canvas = document.createElement("canvas");
         canvas.width = this.getConstraintBestValue(constraints, "video", "width");
         canvas.height = this.getConstraintBestValue(constraints, "video", "height");
-        var meta = this.createStartedRandomCanvasDrawerInterval(canvas);
+        const meta = this.createStartedRandomCanvasDrawerInterval(canvas);
         this._log("log", "mock canvas meta", meta);
-        var stream = canvas.captureStream(this.getConstraintBestValue(constraints, "video", "frameRate"));
+        const stream = canvas.captureStream(this.getConstraintBestValue(constraints, "video", "frameRate"));
         // @ts-ignore
         stream.stop = this._createStopCanvasStreamFunction(stream, meta);
         return stream;
-    };
+    }
     /**
      * Returns stream with media used as source.
      * @param {MediaStreamConstraints} constraints
      * @return {MediaStream}
      */
-    GetUserMediaMock.prototype.getMockMediaElementStream = function (constraints) {
-        var video = document.createElement("video");
+    getMockMediaElementStream(constraints) {
+        const video = document.createElement("video");
         video.autoplay = true;
         video.loop = true;
         this._log("log", "mediaElement source video", video);
@@ -305,31 +300,31 @@ var GetUserMediaMock = /** @class */ (function () {
         video.play();
         // @ts-ignore
         return video.captureStream();
-    };
+    }
     /**
      * Creates and starts an interval that paints randomly to a canvas.
      * @param {HTMLCanvasElement} canvas
      * @returns meta data including interval that can be cleared with window.clearInterval
      */
-    GetUserMediaMock.prototype.createStartedRandomCanvasDrawerInterval = function (canvas) {
-        var FPS = 2;
-        var ms = 1000 / FPS;
-        var getRandom = function (max) {
+    createStartedRandomCanvasDrawerInterval(canvas) {
+        const FPS = 2;
+        const ms = 1000 / FPS;
+        const getRandom = (max) => {
             return Math.floor(Math.random() * max);
         };
-        var handle = function () {
-            var ctx = canvas.getContext("2d");
-            var x = 0;
-            var y = 0;
-            var width = getRandom(canvas.width);
-            var height = getRandom(canvas.height);
-            var r = getRandom(255);
-            var g = getRandom(255);
-            var b = getRandom(255);
-            ctx.fillStyle = "rgb(".concat(r, ",").concat(g, ",").concat(b, ")");
+        const handle = () => {
+            const ctx = canvas.getContext("2d");
+            const x = 0;
+            const y = 0;
+            const width = getRandom(canvas.width);
+            const height = getRandom(canvas.height);
+            const r = getRandom(255);
+            const g = getRandom(255);
+            const b = getRandom(255);
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
             ctx.fillRect(x, y, width, height);
         };
-        var interval = window.setInterval(handle, ms);
+        const interval = window.setInterval(handle, ms);
         // Execute once due to Firefox issue where canvas MUST NOT be empty.
         // Exception... "Component not initialized"  nsresult: "0xc1f30001 (NS_ERROR_NOT_INITIALIZED)"
         handle();
@@ -337,7 +332,7 @@ var GetUserMediaMock = /** @class */ (function () {
             canvas: canvas,
             interval: interval,
         };
-    };
+    }
     /**
      * Gets constraint best value by necessary identifiers.
      * Returns appropriate defaults where important.
@@ -347,21 +342,21 @@ var GetUserMediaMock = /** @class */ (function () {
      * @param {MediaStreamTrackType} type
      * @param {keyof MediaStreamTrack} key
      */
-    GetUserMediaMock.prototype.getConstraintBestValue = function (constraints, type, key) {
-        var subConstraints = typeof constraints[type] === "object" ? constraints[type] : {};
-        var cVal = subConstraints[key];
-        var value;
+    getConstraintBestValue(constraints, type, key) {
+        const subConstraints = typeof constraints[type] === "object" ? constraints[type] : {};
+        const cVal = subConstraints[key];
+        let value;
         if (typeof cVal !== "object") {
             value = cVal;
         }
         else if (cVal) {
-            for (var key_1 in cVal) {
-                if (key_1 === "ideal") {
-                    value = cVal[key_1];
+            for (const key in cVal) {
+                if (key === "ideal") {
+                    value = cVal[key];
                     break;
                 }
                 else {
-                    value = cVal[key_1];
+                    value = cVal[key];
                 }
             }
         }
@@ -376,12 +371,12 @@ var GetUserMediaMock = /** @class */ (function () {
             value = 15;
         }
         return value;
-    };
+    }
     /**
      * Returns a set of mock devices using similar format.
      */
-    GetUserMediaMock.prototype.getMockDevices = function () {
-        var devices = [
+    getMockDevices() {
+        const devices = [
             {
                 kind: "audioinput",
                 label: "(4- BUFFALO BSW32KM03 USB PC Camera)",
@@ -395,8 +390,8 @@ var GetUserMediaMock = /** @class */ (function () {
                 label: "BUFFALO BSW32KM03 USB PC Camera",
             },
         ];
-        return new Promise(function (resolve) {
-            devices.forEach(function (device, index) {
+        return new Promise((resolve) => {
+            devices.forEach((device, index) => {
                 // @ts-ignore
                 device.deviceId = String(index);
                 // @ts-ignore
@@ -404,37 +399,31 @@ var GetUserMediaMock = /** @class */ (function () {
             });
             return resolve(devices);
         });
-    };
+    }
     /**
      * @param {MediaStream} stream
      * @param {{ interval: number }} meta
      * @return {() => void)}
      */
-    GetUserMediaMock.prototype._createStopCanvasStreamFunction = function (stream, meta) {
-        return function () {
+    _createStopCanvasStreamFunction(stream, meta) {
+        return () => {
             window.clearInterval(meta.interval);
-            var tracks = stream.getTracks();
-            tracks.forEach(function (track) {
+            const tracks = stream.getTracks();
+            tracks.forEach((track) => {
                 track.stop();
             });
             if (stream.stop) {
                 stream.stop = undefined;
             }
         };
-    };
-    GetUserMediaMock.prototype._log = function (type) {
-        var _a;
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
+    }
+    _log(type, ...args) {
         if (window.console && window.console[type]) {
-            (_a = window.console)[type].apply(_a, args);
+            window.console[type](...args);
         }
-    };
-    return GetUserMediaMock;
-}());
-var mock = new GetUserMediaMock();
+    }
+}
+const mock = new GetUserMediaMock();
 window.getUserMediaMock = mock;
 mock.mock(MockOptions());
 alert("ok");
