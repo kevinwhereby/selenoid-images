@@ -5,7 +5,7 @@ RUN apt-get update && \
 
 # libjxl required for webkit build
 RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev \
-    build-essential ccache
+    libsysprof-4-dev build-essential ccache
 
 RUN --mount=type=bind,target=/tmp/libjxl,source=libjxl \
     dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb && \
@@ -23,13 +23,14 @@ RUN \
 # install deps
 RUN mkdir -p /opt/webkit
 
+WORKDIR /webkit
+
+RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
+
 RUN --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
     --mount=type=cache,target=/root/.ccache \
     export CCACHE_DIR=/root/.ccache && \
     export PATH="/usr/lib/ccache:$PATH" && \
-    apt-get -y install libsysprof-4-dev && \
-    cd /webkit && \
-    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
