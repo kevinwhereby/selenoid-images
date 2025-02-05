@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # libjxl required for webkit build
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get -y install libbrotli1 libhwy-dev
+    apt-get update && apt-get -y install libbrotli1 libhwy-dev build-essential
 
 RUN --mount=type=bind,target=/tmp/libjxl,source=libjxl \
     dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb && \
