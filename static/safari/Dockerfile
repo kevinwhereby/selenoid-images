@@ -73,7 +73,7 @@ FROM browsers/base:7.4.2
 COPY --from=build /opt/webkit /opt/webkit
 COPY --from=go /prism/prism /usr/bin/
 
-RUN apt-get update && /opt/webkit/minibrowser-gtk/install-dependencies.sh -y
+RUN apt-get update && y | /opt/webkit/minibrowser-gtk/install-dependencies.sh --autoinstall
 COPY thing.js /opt/thing.js
 
 ENV LD_LIBRARY_PATH /opt/webkit/lib/:${LD_LIBRARY_PATH}
