@@ -34,6 +34,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get -y install libsysprof-4-dev && \
     yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
     cd /webkit && \
+    ls &&
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
