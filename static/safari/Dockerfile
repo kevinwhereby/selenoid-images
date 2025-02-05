@@ -30,12 +30,10 @@ RUN mkdir -p /opt/webkit
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
     apt-get -y install libsysprof-4-dev && \
-    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
-
-RUN --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
     cd /webkit && \
-    ls && \
+    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
