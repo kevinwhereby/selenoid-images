@@ -27,7 +27,7 @@ RUN --mount=type=bind,target=/webkit,source=webkit,rw \
     --mount=type=cache,target=/root/.ccache \
     export CCACHE_DIR=/root/.ccache && \
     export PATH="/usr/lib/ccache:$PATH" && \
-    cd /webkit &&
+    cd /webkit && \
     yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies \
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
