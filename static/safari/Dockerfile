@@ -110,8 +110,6 @@ RUN \
     mkdir /tmp/ca-certificates && \
     chmod 777 /tmp/ca-certificates
 
-RUN apt-get -y install man-db
-
 COPY entrypoint.sh /
 
 USER selenium
