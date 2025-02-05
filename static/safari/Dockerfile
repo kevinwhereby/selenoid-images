@@ -73,12 +73,15 @@ FROM browsers/base:7.4.2
 COPY --from=build /opt/webkit /opt/webkit
 COPY --from=go /prism/prism /usr/bin/
 
+RUN apt-get update && /opt/webkit/minibrowser-gtk/install-dependencies.sh
+COPY thing.js /opt/thing.js
+
 ENV LD_LIBRARY_PATH /opt/webkit/lib/:${LD_LIBRARY_PATH}
 
-RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev
-COPY libjxl /tmp/libjxl
-RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
-RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
+# RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev
+# COPY libjxl /tmp/libjxl
+# RUN dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb
+# RUN dpkg -i /tmp/libjxl/libjxl-dev_0.11.1_amd64.deb
 
 RUN \
     apt-get update && \
