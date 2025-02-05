@@ -28,48 +28,32 @@ RUN \
 # install deps
 RUN mkdir -p /opt/webkit
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
-    apt-get -y install libsysprof-4-dev && \
-    cd /webkit && \
-    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
-    cmake -DPORT=GTK \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/opt/webkit \
-        -DUSE_WPE_RENDERER=OFF \
-        -DENABLE_MINIBROWSER=ON \
-        -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
-        -DENABLE_GAMEPAD=OFF \
-        -DENABLE_SPELLCHECK=OFF \
-        -DENABLE_WAYLAND_TARGET=OFF \
-        -DENABLE_WEB_RTC=ON \
-        # -DENABLE_EXPERIMENTAL_FEATURES=ON \
-        -DUSE_OPENJPEG=OFF -GNinja \
-        -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
-        -DCMAKE_INCLUDE_PATH=/usr/include \
-        -DSysProfCapture_INCLUDE_DIR=/usr/include/sysprof-4 \
-        -DJPEGXL_LIBRARY=/usr/lib/x86_64-linux-gnu/libjxl.so.0.11.1 \
-        -DJPEGXL_INCLUDE_DIR=/usr/include && \
-    ninja && \
-    ninja install && \
-    rm -Rf /var/lib/apt/lists/*
-
-# RUN \
-#     git clone --depth 1 --single-branch --branch "$WEBKIT_TAG" https://github.com/WebKit/WebKit.git /webkit
-
-# WORKDIR /webkit
-
-# RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
-
-# WORKDIR /
-
-
-
-# WORKDIR /webkit
-
-# RUN apt-get update && \
-#     apt-get install -y libsysprof-4-dev
+# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+#     --mount=type=cache,target=/var/lib/apt,sharing=locked \
+#     --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
+#     apt-get -y install libsysprof-4-dev && \
+#     cd /webkit && \
+#     yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
+#     cmake -DPORT=GTK \
+#         -DCMAKE_BUILD_TYPE=Release \
+#         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
+#         -DUSE_WPE_RENDERER=OFF \
+#         -DENABLE_MINIBROWSER=ON \
+#         -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
+#         -DENABLE_GAMEPAD=OFF \
+#         -DENABLE_SPELLCHECK=OFF \
+#         -DENABLE_WAYLAND_TARGET=OFF \
+#         -DENABLE_WEB_RTC=ON \
+#         # -DENABLE_EXPERIMENTAL_FEATURES=ON \
+#         -DUSE_OPENJPEG=OFF -GNinja \
+#         -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
+#         -DCMAKE_INCLUDE_PATH=/usr/include \
+#         -DSysProfCapture_INCLUDE_DIR=/usr/include/sysprof-4 \
+#         -DJPEGXL_LIBRARY=/usr/lib/x86_64-linux-gnu/libjxl.so.0.11.1 \
+#         -DJPEGXL_INCLUDE_DIR=/usr/include && \
+#     ninja && \
+#     ninja install && \
+#     rm -Rf /var/lib/apt/lists/*
 
 # # # try the build
 # RUN \
