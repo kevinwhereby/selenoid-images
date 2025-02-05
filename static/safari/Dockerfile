@@ -1,16 +1,10 @@
 FROM ubuntu:22.04 AS build
 
-# ARG WEBKIT_TAG="main"
-
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
+RUN apt-get update && \
     apt-get -y install --no-install-recommends ca-certificates git
 
 # libjxl required for webkit build
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get -y install libbrotli1 libhwy-dev build-essential
+RUN apt-get update && apt-get -y install libbrotli1 libhwy-dev build-essential
 
 RUN --mount=type=bind,target=/tmp/libjxl,source=libjxl \
     dpkg -i /tmp/libjxl/libjxl_0.11.1_amd64.deb && \
@@ -28,32 +22,30 @@ RUN \
 # install deps
 RUN mkdir -p /opt/webkit
 
-# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-#     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-#     --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
-#     apt-get -y install libsysprof-4-dev && \
-#     cd /webkit && \
-#     yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
-#     cmake -DPORT=GTK \
-#         -DCMAKE_BUILD_TYPE=Release \
-#         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
-#         -DUSE_WPE_RENDERER=OFF \
-#         -DENABLE_MINIBROWSER=ON \
-#         -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
-#         -DENABLE_GAMEPAD=OFF \
-#         -DENABLE_SPELLCHECK=OFF \
-#         -DENABLE_WAYLAND_TARGET=OFF \
-#         -DENABLE_WEB_RTC=ON \
-#         # -DENABLE_EXPERIMENTAL_FEATURES=ON \
-#         -DUSE_OPENJPEG=OFF -GNinja \
-#         -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
-#         -DCMAKE_INCLUDE_PATH=/usr/include \
-#         -DSysProfCapture_INCLUDE_DIR=/usr/include/sysprof-4 \
-#         -DJPEGXL_LIBRARY=/usr/lib/x86_64-linux-gnu/libjxl.so.0.11.1 \
-#         -DJPEGXL_INCLUDE_DIR=/usr/include && \
-#     ninja && \
-#     ninja install && \
-#     rm -Rf /var/lib/apt/lists/*
+RUN --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
+    apt-get -y install libsysprof-4-dev && \
+    cd /webkit && \
+    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies && \
+    cmake -DPORT=GTK \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/opt/webkit \
+        -DUSE_WPE_RENDERER=OFF \
+        -DENABLE_MINIBROWSER=ON \
+        -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
+        -DENABLE_GAMEPAD=OFF \
+        -DENABLE_SPELLCHECK=OFF \
+        -DENABLE_WAYLAND_TARGET=OFF \
+        -DENABLE_WEB_RTC=ON \
+        # -DENABLE_EXPERIMENTAL_FEATURES=ON \
+        -DUSE_OPENJPEG=OFF -GNinja \
+        -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
+        -DCMAKE_INCLUDE_PATH=/usr/include \
+        -DSysProfCapture_INCLUDE_DIR=/usr/include/sysprof-4 \
+        -DJPEGXL_LIBRARY=/usr/lib/x86_64-linux-gnu/libjxl.so.0.11.1 \
+        -DJPEGXL_INCLUDE_DIR=/usr/include && \
+    ninja && \
+    ninja install && \
+    rm -Rf /var/lib/apt/lists/*
 
 # # # try the build
 # RUN \
