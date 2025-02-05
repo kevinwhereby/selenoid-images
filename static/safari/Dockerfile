@@ -25,12 +25,11 @@ RUN mkdir -p /opt/webkit
 
 WORKDIR /webkit
 
-RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
-
 RUN --mount=type=bind,target=/webkit,source=webkitgtk-2.46.5,rw \
     --mount=type=cache,target=/root/.ccache \
     export CCACHE_DIR=/root/.ccache && \
     export PATH="/usr/lib/ccache:$PATH" && \
+    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies |
     cmake -DPORT=GTK \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
