@@ -23,14 +23,16 @@ RUN \
 # install deps
 RUN mkdir -p /opt/webkit
 
-RUN --mount=type=bind,target=/webkit,source=webkit,rw \
-    --mount=type=cache,target=/root/.ccache \
+COPY webkit /webkit
+
+WORKDIR /webkit
+
+RUN yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies
+
+RUN --mount=type=cache,target=/root/.ccache \
     export CCACHE_DIR=/root/.ccache && \
     export PATH="/usr/lib/ccache:$PATH" && \
-    cd /webkit && \
-    yes | DEBIAN_FRONTEND=noninteractive Tools/gtk/install-dependencies \
     cmake -DPORT=GTK \
-        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/webkit \
         -DUSE_WPE_RENDERER=OFF \
