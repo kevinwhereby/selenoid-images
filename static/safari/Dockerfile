@@ -49,7 +49,8 @@ RUN \
         -DENABLE_GAMEPAD=OFF \
         -DENABLE_SPELLCHECK=OFF \
         -DENABLE_WAYLAND_TARGET=OFF \
-        -DENABLE_EXPERIMENTAL_FEATURES=ON \
+        -DENABLE_WEB_RTC=ON \
+        # -DENABLE_EXPERIMENTAL_FEATURES=ON \
         -DUSE_OPENJPEG=OFF -GNinja \
         -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu \
         -DCMAKE_INCLUDE_PATH=/usr/include \
