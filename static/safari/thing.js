@@ -426,4 +426,4 @@ class GetUserMediaMock {
 const mock = new GetUserMediaMock();
 window.getUserMediaMock = mock;
 mock.mock(MockOptions());
-alert("ok");
+console.log("OK!")
